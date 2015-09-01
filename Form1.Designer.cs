@@ -38,7 +38,6 @@
             this.LblStatus = new MetroFramework.Controls.MetroLabel();
             this.LblApiKey = new MetroFramework.Controls.MetroLabel();
             this.TTLblApi = new MetroFramework.Components.MetroToolTip();
-            this.PropgressBar = new MetroFramework.Controls.MetroProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.msmMain)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,10 +72,10 @@
             // 
             // ProgressSpinner
             // 
-            this.ProgressSpinner.Location = new System.Drawing.Point(23, 134);
+            this.ProgressSpinner.Location = new System.Drawing.Point(189, 129);
             this.ProgressSpinner.Maximum = 100;
             this.ProgressSpinner.Name = "ProgressSpinner";
-            this.ProgressSpinner.Size = new System.Drawing.Size(50, 50);
+            this.ProgressSpinner.Size = new System.Drawing.Size(55, 55);
             this.ProgressSpinner.TabIndex = 2;
             this.ProgressSpinner.UseSelectable = true;
             // 
@@ -114,19 +113,11 @@
             this.TTLblApi.StyleManager = null;
             this.TTLblApi.Theme = MetroFramework.MetroThemeStyle.Light;
             // 
-            // PropgressBar
-            // 
-            this.PropgressBar.Location = new System.Drawing.Point(79, 134);
-            this.PropgressBar.Name = "PropgressBar";
-            this.PropgressBar.Size = new System.Drawing.Size(333, 38);
-            this.PropgressBar.TabIndex = 6;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(435, 236);
-            this.Controls.Add(this.PropgressBar);
             this.Controls.Add(this.LblApiKey);
             this.Controls.Add(this.LblStatus);
             this.Controls.Add(this.LblStatusTitle);
@@ -153,7 +144,6 @@
         private MetroFramework.Controls.MetroLabel LblStatus;
         private MetroFramework.Controls.MetroLabel LblApiKey;
         private MetroFramework.Components.MetroToolTip TTLblApi;
-        private MetroFramework.Controls.MetroProgressBar PropgressBar;
     }
 }
 
