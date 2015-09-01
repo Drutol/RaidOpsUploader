@@ -1,0 +1,11 @@
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\RaidOpsUploader.exe.config
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\RaidOpsUploader.exe
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\RaidOpsUploader.pdb
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\MetroFramework.Design.dll
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\MetroFramework.dll
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\MetroFramework.Fonts.dll
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.Properties.Resources.resources
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.csproj.GenerateResource.Cache
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.exe
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.pdb
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.Main.resources

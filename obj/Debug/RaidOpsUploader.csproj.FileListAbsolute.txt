@@ -1,0 +1,12 @@
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\RaidOpsUploader.exe.config
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\RaidOpsUploader.exe
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\RaidOpsUploader.pdb
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\MetroFramework.Design.dll
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\MetroFramework.dll
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\MetroFramework.Fonts.dll
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.csprojResolveAssemblyReference.cache
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.Properties.Resources.resources
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.csproj.GenerateResource.Cache
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.exe
+c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.pdb
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.Main.resources
