@@ -10,3 +10,5 @@ c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsU
 c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.exe
 c:\users\mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.pdb
 C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Debug\RaidOpsUploader.Main.resources
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Debug\Newtonsoft.Json.xml

@@ -12,6 +12,8 @@ using System.Net;
 using System.IO;
 using System.Xml.Linq;
 using System.Threading;
+using Newtonsoft.Json;
+using System.Web;
 
 namespace RaidOpsUploader
 {
@@ -61,6 +63,14 @@ namespace RaidOpsUploader
             ProgressSpinner.Invoke((MethodInvoker)(() =>
             {
                 ProgressSpinner.Value = step;
+            }));
+        }
+
+        public void setMax(int max)
+        {
+            ProgressSpinner.Invoke((MethodInvoker)(() =>
+            {
+                ProgressSpinner.Maximum = max;
             }));
         }
 
@@ -164,24 +174,38 @@ namespace RaidOpsUploader
             
         }
 
+        struct Response
+        {
+            public int code;
+            public string msg;
+        }
+
+        struct Request
+        {
+            public string json;
+            public string key;
+
+            public Request(string json,string key)
+            {
+                this.json = json;
+                this.key = key;
+            }
+        }
+
         private void SendRequest(string jsonData)
         {
-            WebRequest request = WebRequest.Create("http://www.raidops.net/api/import.json?key="+ StrBoxAPIKey.Text + "&json=" + jsonData);
-            //request.Timeout = 2000;
+            Request dataPacket = new Request(jsonData, StrBoxAPIKey.Text);
+            WebRequest request = WebRequest.Create(Uri.EscapeUriString("http://www.raidops.net:9292/api/import.json"));
+            request.ContentType = "application/json";
             request.Method = "POST";
-            byte[] byteArray = Encoding.UTF8.GetBytes("");
-            // Set the ContentType property of the WebRequest.
-            request.ContentType = "application/x-www-form-urlencoded";
-            // Set the ContentLength property of the WebRequest.
-           // request.ContentLength = byteArray.Length;
-            // Get the request stream.
-           // Stream dataStream = request.GetRequestStream();
-            // Write the data to the request stream.
-           // dataStream.Write(byteArray, 0, byteArray.Length);
-            // Close the Stream object.
-            //dataStream.Close();
-            // Get the response.
-            
+            byte[] bytedata = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(dataPacket));
+            request.ContentLength = bytedata.Length;
+
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(bytedata, 0, bytedata.Length);
+            requestStream.Flush();
+            requestStream.Close();
+
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             if (response == null || response.StatusCode != HttpStatusCode.OK)
             {
@@ -195,8 +219,57 @@ namespace RaidOpsUploader
                 responseString = reader.ReadToEnd();
             }
 
+            Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+            
+            setStatus(objResponse.msg);
+            GetImportProgress();
+        }
 
-            setStatus(responseString);
+        private void GetImportProgress()
+        {
+            bool done = false;
+            int counter = 0;
+            while (!done)
+            {
+                WebRequest request = WebRequest.Create(Uri.EscapeUriString("http://www.raidops.net:9292/api/get_status.json?key=" + StrBoxAPIKey.Text));
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.Method = "POST";
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                {
+                    setStatus("No response from server...");
+                }
+
+                string responseString = "";
+                using (Stream stream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    responseString = reader.ReadToEnd();
+                }
+
+                Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+
+                setStatus(objResponse.msg);
+
+                if (counter == 0)
+                {
+                    List<String> parts = new List<String>();
+                    if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
+                    setMax(Convert.ToInt32(parts.Last()));
+                    setProgress(0);
+                }
+                else
+                {
+                    List<String> parts = new List<String>();
+                    if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
+                    setProgress(Convert.ToInt32(parts.First()));
+                }
+
+                Thread.Sleep(500);
+                counter++;
+                if (counter > 40 || objResponse.msg == "Import successful") done = true;
+            }
         }
 
     }
