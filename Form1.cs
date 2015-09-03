@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using MetroFramework.Forms;
 using System.Net;
@@ -13,7 +9,6 @@ using System.IO;
 using System.Xml.Linq;
 using System.Threading;
 using Newtonsoft.Json;
-using System.Web;
 
 namespace RaidOpsUploader
 {
@@ -29,25 +24,34 @@ namespace RaidOpsUploader
             this.ProgressSpinner.Speed = 1;
             ProgressSpinner.Maximum = 4;
             setProgress(-1);
+
+            StrBoxAPIKey.Text = Properties.Settings.Default.APIKey;
         }
 
         private void BtnUpload_Click(object sender, EventArgs e)
         {
-            //ProgressSpinner.Speed = 2;
             setProgress(0);
             try
             {
-                System.Threading.ThreadPool.QueueUserWorkItem(delegate {IsWebsiteUp();}, null);
+                ThreadPool.QueueUserWorkItem(delegate {IsWebsiteUp();}, null);
             }
             catch (Exception exc)
             {
-                reset(exc.Message);
+                reset();
             }
         }
 
-        private void reset(String msg)
+        private void reset()
         {
-            LblStatus.Text = msg;
+            setProgress(-1);
+            BtnDown.Invoke((MethodInvoker)(() =>
+            {
+                BtnDown.Enabled = true;
+            }));
+            BtnDown.Invoke((MethodInvoker)(() =>
+            {
+                BtnDown.Enabled = true;
+            }));
         }
 
         public void setStatus(string msg)
@@ -77,22 +81,36 @@ namespace RaidOpsUploader
 
 
         // Upload Chain
-        private void IsWebsiteUp()
+        private void IsWebsiteUp(bool down = false)
         {
+            BtnDown.Invoke((MethodInvoker)(() =>
+            {
+                BtnDown.Enabled = false;
+            }));
+            BtnDown.Invoke((MethodInvoker)(() =>
+            {
+                BtnDown.Enabled = false;
+            }));
             setStatus("Checking if website is up and running...");
 
             WebRequest request = WebRequest.Create("http://www.raidops.net");
             request.Timeout = 2000;
-            
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response == null || response.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Website Down");
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                   setStatus("Website Down");
+            }
+            catch
+            {
+                reset();
+            }
             request.Abort();
             setProgress(1);
-            IsApiUp();
+            IsApiUp(down);
         }
 
-        private void IsApiUp()
+        private void IsApiUp(bool down)
         {
             setStatus("Checking if API is up and running...");
 
@@ -100,11 +118,25 @@ namespace RaidOpsUploader
             request.Timeout = 2000;
             request.Method = "POST";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response == null || response.StatusCode != HttpStatusCode.OK)
-                throw new Exception("API Down");
+            try
+            {
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                    setStatus("API Down");
+            }
+            catch
+            {
+                reset();
+            }
             request.Abort();
             setProgress(2);
-            IsDataInClipboard();
+            if (down)
+            {
+                SendDownloadRequest();
+            }
+            else
+            {
+                IsDataInClipboard();
+            }
         }
 
         private void IsDataInClipboard()
@@ -134,7 +166,7 @@ namespace RaidOpsUploader
         {
             setStatus("Looking for addon's save data... (xml)");
             
-            String filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\Wildstar\\AddonSaveData\\RaidOps_0_Gen.xml");
+            String filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\WildstarPTR\\AddonSaveData\\RaidOps_0_Gen.xml");
             if (!File.Exists(filePath)) throw new Exception(filePath);
 
             StreamReader streamReader = new StreamReader(filePath);
@@ -149,25 +181,30 @@ namespace RaidOpsUploader
             
             XElement xmlSave = XElement.Load(xmlData);
             bool bFound = false;
-            string jsonData = "";
-            foreach (var item in xmlSave.Elements())
+            string str = "";
+
+            foreach (XElement element in xmlSave.Elements())
             {
-                string nodeName = Convert.ToString(item.Attribute("K"));
-                if (nodeName == "K=\"dataForWebsiteExport\"")
+                if(element.Attribute("K") != null)
                 {
-                    bFound = true;
-                    jsonData = item.Value;
-                    break; 
+                    if (element.Attribute("K").Value == "importDataForUploader")
+                    {
+                        str = element.Attribute("V").Value.ToString().Replace("&amp;", "&").Replace("&apos;", "\'").Replace("&quot;", "\"");
+                        bFound = true;
+                    }
                 }
+               
             }
+
             if (!bFound)
             {
                 setStatus("There's no website export data stored...");
+                reset();
                 return;
             }
             else
             {
-                SendRequest(jsonData);
+                SendRequest(str);
             }
 
             setProgress(4);
@@ -178,6 +215,7 @@ namespace RaidOpsUploader
         {
             public int code;
             public string msg;
+            public string data;
         }
 
         struct Request
@@ -194,6 +232,7 @@ namespace RaidOpsUploader
 
         private void SendRequest(string jsonData)
         {
+            setStatus("Sending import request...");
             Request dataPacket = new Request(jsonData, StrBoxAPIKey.Text);
             WebRequest request = WebRequest.Create(Uri.EscapeUriString("http://www.raidops.net:9292/api/import.json"));
             request.ContentType = "application/json";
@@ -205,23 +244,30 @@ namespace RaidOpsUploader
             requestStream.Write(bytedata, 0, bytedata.Length);
             requestStream.Flush();
             requestStream.Close();
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response == null || response.StatusCode != HttpStatusCode.OK)
+            try
             {
-                setStatus("No response from server...");
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                {
+                    setStatus("No response from server...");
+                }
+
+                string responseString = "";
+                using (Stream stream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    responseString = reader.ReadToEnd();
+                }
+
+                Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+
+                setStatus(objResponse.msg);
+            }
+            catch
+            {
+
             }
 
-            string responseString = "";
-            using (Stream stream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-                responseString = reader.ReadToEnd();
-            }
-
-            Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
-            
-            setStatus(objResponse.msg);
             GetImportProgress();
         }
 
@@ -252,27 +298,102 @@ namespace RaidOpsUploader
 
                 setStatus(objResponse.msg);
 
-                if (counter == 0)
+                if (objResponse.msg.Contains("/"))
                 {
-                    List<String> parts = new List<String>();
-                    if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
-                    setMax(Convert.ToInt32(parts.Last()));
-                    setProgress(0);
+                    if (counter == 0)
+                    {
+                        List<String> parts = new List<String>();
+                        if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
+                        setMax(Convert.ToInt32(parts.Last()));
+                        setProgress(0);
+                    }
+                    else
+                    {
+                        List<String> parts = new List<String>();
+                        if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
+                        setProgress(Convert.ToInt32(parts.First()));
+                    }
                 }
-                else
-                {
-                    List<String> parts = new List<String>();
-                    if (objResponse.msg.Contains("/")) { parts = objResponse.msg.Split('/').ToList(); }
-                    setProgress(Convert.ToInt32(parts.First()));
-                }
-
                 Thread.Sleep(500);
                 counter++;
-                if (counter > 40 || objResponse.msg == "Import successful") done = true;
+                if (counter > 40 || objResponse.msg == "Import successful" || objResponse.msg == "Failed parsing json...") done = true;
+            }
+            reset();
+        }
+
+        private void BtnDown_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(delegate { IsWebsiteUp(true); }, null);
+            }
+            catch (Exception exc)
+            {
+                reset();
             }
         }
 
+        private void SendDownloadRequest()
+        {
+            setStatus("Sending download reqest...");
+            WebRequest request = null;
+            try
+            {
+                request = WebRequest.Create(Uri.EscapeUriString("http://www.raidops.net:9292/api/download.json?key=" + StrBoxAPIKey.Text));
+            }
+            catch
+            {
+                setStatus("Download failed");
+            }
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.Method = "POST";
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            if (response == null || response.StatusCode != HttpStatusCode.OK)
+            {
+                setStatus("No response from server...");
+            }
+
+            string responseString = "";
+            using (Stream stream = response.GetResponseStream())
+            {
+                StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                responseString = reader.ReadToEnd();
+            }
+
+            Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+            setProgress(4);
+            setStatus(objResponse.msg);
+            if (objResponse.data != null)
+            {
+                AttachStringToXMLFile(objResponse.data);
+            }
+            reset();
+            
+        }
+
+        private void AttachStringToXMLFile(string json)
+        {
+            setStatus("Data imported - you can now log in.");
+            setProgress(-1);
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\WildstarPTR\\AddonSaveData\\RaidOps_0_Gen.xml");
+            var doc = XElement.Load(path);
+            doc.Add(new XElement("N",new XAttribute("K", "importDataFromUploader"),new XAttribute("T","s"),new XAttribute("V", json)));
+            doc.Save(path);
+        }
+
+        private void SaveAPIKey(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.APIKey = StrBoxAPIKey.Text;
+            Properties.Settings.Default.Save();
+        }
     }
+
+
+
+
+
+    // Code snippet from SO
     class ClipboardAsync
     {
 

@@ -9,3 +9,6 @@ C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsU
 C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.exe
 C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.pdb
 C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.Main.resources
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\Newtonsoft.Json.dll
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\bin\Release\Newtonsoft.Json.xml
+C:\Users\Mordonus\documents\visual studio 2015\Projects\RaidOpsUploader\RaidOpsUploader\obj\Release\RaidOpsUploader.csprojResolveAssemblyReference.cache

@@ -38,6 +38,7 @@
             this.LblStatus = new MetroFramework.Controls.MetroLabel();
             this.LblApiKey = new MetroFramework.Controls.MetroLabel();
             this.TTLblApi = new MetroFramework.Components.MetroToolTip();
+            this.BtnDown = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.msmMain)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,6 +70,7 @@
             this.StrBoxAPIKey.Size = new System.Drawing.Size(389, 23);
             this.StrBoxAPIKey.TabIndex = 1;
             this.StrBoxAPIKey.UseSelectable = true;
+            this.StrBoxAPIKey.TextChanged += new System.EventHandler(this.SaveAPIKey);
             // 
             // ProgressSpinner
             // 
@@ -113,11 +115,22 @@
             this.TTLblApi.StyleManager = null;
             this.TTLblApi.Theme = MetroFramework.MetroThemeStyle.Light;
             // 
+            // BtnDown
+            // 
+            this.BtnDown.Location = new System.Drawing.Point(23, 219);
+            this.BtnDown.Name = "BtnDown";
+            this.BtnDown.Size = new System.Drawing.Size(389, 23);
+            this.BtnDown.TabIndex = 6;
+            this.BtnDown.Text = "Download";
+            this.BtnDown.UseSelectable = true;
+            this.BtnDown.Click += new System.EventHandler(this.BtnDown_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(435, 236);
+            this.ClientSize = new System.Drawing.Size(435, 257);
+            this.Controls.Add(this.BtnDown);
             this.Controls.Add(this.LblApiKey);
             this.Controls.Add(this.LblStatus);
             this.Controls.Add(this.LblStatusTitle);
@@ -126,6 +139,7 @@
             this.Controls.Add(this.BtnUpload);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Main";
+            this.Resizable = false;
             this.Style = MetroFramework.MetroColorStyle.Default;
             this.Text = "RaidOps Uploader";
             this.Theme = MetroFramework.MetroThemeStyle.Default;
@@ -144,6 +158,7 @@
         private MetroFramework.Controls.MetroLabel LblStatus;
         private MetroFramework.Controls.MetroLabel LblApiKey;
         private MetroFramework.Components.MetroToolTip TTLblApi;
+        private MetroFramework.Controls.MetroButton BtnDown;
     }
 }
 
