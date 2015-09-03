@@ -166,7 +166,7 @@ namespace RaidOpsUploader
         {
             setStatus("Looking for addon's save data... (xml)");
             
-            String filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\WildstarPTR\\AddonSaveData\\RaidOps_0_Gen.xml");
+            String filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\Wildstar\\AddonSaveData\\RaidOps_0_Gen.xml");
             if (!File.Exists(filePath)) throw new Exception(filePath);
 
             StreamReader streamReader = new StreamReader(filePath);
@@ -340,33 +340,34 @@ namespace RaidOpsUploader
             try
             {
                 request = WebRequest.Create(Uri.EscapeUriString("http://www.raidops.net:9292/api/download.json?key=" + StrBoxAPIKey.Text));
+
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.Method = "POST";
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                {
+                    setStatus("No response from server...");
+                }
+
+                string responseString = "";
+                using (Stream stream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    responseString = reader.ReadToEnd();
+                }
+
+                Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+                setProgress(4);
+                setStatus(objResponse.msg);
+                if (objResponse.data != null)
+                {
+                    AttachStringToXMLFile(objResponse.data);
+                }
             }
             catch
             {
                 setStatus("Download failed");
-            }
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Method = "POST";
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response == null || response.StatusCode != HttpStatusCode.OK)
-            {
-                setStatus("No response from server...");
-            }
-
-            string responseString = "";
-            using (Stream stream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-                responseString = reader.ReadToEnd();
-            }
-
-            Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
-            setProgress(4);
-            setStatus(objResponse.msg);
-            if (objResponse.data != null)
-            {
-                AttachStringToXMLFile(objResponse.data);
             }
             reset();
             
@@ -376,7 +377,7 @@ namespace RaidOpsUploader
         {
             setStatus("Data imported - you can now log in.");
             setProgress(-1);
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\WildstarPTR\\AddonSaveData\\RaidOps_0_Gen.xml");
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NCSOFT\\Wildstar\\AddonSaveData\\RaidOps_0_Gen.xml");
             var doc = XElement.Load(path);
             doc.Add(new XElement("N",new XAttribute("K", "importDataFromUploader"),new XAttribute("T","s"),new XAttribute("V", json)));
             doc.Save(path);
