@@ -10,11 +10,14 @@ using System.Xml.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 
+
+
 namespace RaidOpsUploader
 {
+    
     public partial class Main : MetroForm
     {
-        
+        const string ver = "1.1";
         public Main()
         {
             InitializeComponent();
@@ -24,8 +27,28 @@ namespace RaidOpsUploader
             this.ProgressSpinner.Speed = 1;
             ProgressSpinner.Maximum = 4;
             setProgress(-1);
-
+            VersionLabel.Text = string.Format("Version {0}",ver);
+            ThreadPool.QueueUserWorkItem(delegate { CheckForUpdates(); }, null);
             StrBoxAPIKey.Text = Properties.Settings.Default.APIKey;
+        }
+
+        struct Response
+        {
+            public int code;
+            public string msg;
+            public string data;
+        }
+
+        struct Request
+        {
+            public string json;
+            public string key;
+
+            public Request(string json, string key)
+            {
+                this.json = json;
+                this.key = key;
+            }
         }
 
         private void BtnUpload_Click(object sender, EventArgs e)
@@ -41,6 +64,32 @@ namespace RaidOpsUploader
             }
         }
 
+        private void CheckForUpdates()
+        {
+            WebRequest request = WebRequest.Create("http://www.raidops.net/api/curr_version.json");
+            request.Timeout = 2000;
+            request.Method = "POST";
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            try
+            {
+                string responseString = "";
+                using (Stream stream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    responseString = reader.ReadToEnd();
+                }
+
+                Response objResponse = JsonConvert.DeserializeObject<Response>(responseString);
+
+                if (objResponse.data != ver) setUpdateStatus(objResponse.data);
+
+            }
+            catch
+            {
+                request.Abort();
+            }
+        }
+
         private void reset()
         {
             setProgress(-1);
@@ -53,7 +102,7 @@ namespace RaidOpsUploader
                 BtnDown.Enabled = true;
             }));
         }
-
+        #region Invokers
         public void setStatus(string msg)
         {
             LblStatus.Invoke((MethodInvoker)(() =>
@@ -77,10 +126,16 @@ namespace RaidOpsUploader
                 ProgressSpinner.Maximum = max;
             }));
         }
+        public void setUpdateStatus(string version)
+        {
+            UpdateNotice.Invoke((MethodInvoker)(() =>
+            {
+                UpdateNotice.Text = string.Format("Update available... ({0})",version);
 
-
-
-        // Upload Chain
+            }));
+        }
+        #endregion
+        #region ActionChain
         private void IsWebsiteUp(bool down = false)
         {
             BtnDown.Invoke((MethodInvoker)(() =>
@@ -211,24 +266,7 @@ namespace RaidOpsUploader
             
         }
 
-        struct Response
-        {
-            public int code;
-            public string msg;
-            public string data;
-        }
 
-        struct Request
-        {
-            public string json;
-            public string key;
-
-            public Request(string json,string key)
-            {
-                this.json = json;
-                this.key = key;
-            }
-        }
 
         private void SendRequest(string jsonData)
         {
@@ -316,22 +354,11 @@ namespace RaidOpsUploader
                 }
                 Thread.Sleep(500);
                 counter++;
-                if (counter > 40 || objResponse.msg == "Import successful" || objResponse.msg == "Failed parsing json...") done = true;
+                if (counter > 80 || objResponse.msg == "Import successful" || objResponse.msg == "Failed parsing json...") done = true;
             }
             reset();
         }
 
-        private void BtnDown_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ThreadPool.QueueUserWorkItem(delegate { IsWebsiteUp(true); }, null);
-            }
-            catch (Exception exc)
-            {
-                reset();
-            }
-        }
 
         private void SendDownloadRequest()
         {
@@ -370,8 +397,22 @@ namespace RaidOpsUploader
                 setStatus("Download failed");
             }
             reset();
-            
+
         }
+        #endregion 
+
+        private void BtnDown_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(delegate { IsWebsiteUp(true); }, null);
+            }
+            catch (Exception exc)
+            {
+                reset();
+            }
+        }
+
 
         private void AttachStringToXMLFile(string json)
         {
@@ -387,6 +428,16 @@ namespace RaidOpsUploader
         {
             Properties.Settings.Default.APIKey = StrBoxAPIKey.Text;
             Properties.Settings.Default.Save();
+        }
+
+        private void UpdateNotice_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Mordonus/RaidOpsUploader/releases/latest");
+        }
+
+        private void StrBoxAPIKey_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

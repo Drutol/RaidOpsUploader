@@ -39,6 +39,8 @@
             this.LblApiKey = new MetroFramework.Controls.MetroLabel();
             this.TTLblApi = new MetroFramework.Components.MetroToolTip();
             this.BtnDown = new MetroFramework.Controls.MetroButton();
+            this.UpdateNotice = new MetroFramework.Controls.MetroLink();
+            this.VersionLabel = new MetroFramework.Controls.MetroLabel();
             ((System.ComponentModel.ISupportInitialize)(this.msmMain)).BeginInit();
             this.SuspendLayout();
             // 
@@ -71,6 +73,7 @@
             this.StrBoxAPIKey.TabIndex = 1;
             this.StrBoxAPIKey.UseSelectable = true;
             this.StrBoxAPIKey.TextChanged += new System.EventHandler(this.SaveAPIKey);
+            this.StrBoxAPIKey.Click += new System.EventHandler(this.StrBoxAPIKey_Click);
             // 
             // ProgressSpinner
             // 
@@ -125,11 +128,34 @@
             this.BtnDown.UseSelectable = true;
             this.BtnDown.Click += new System.EventHandler(this.BtnDown_Click);
             // 
+            // UpdateNotice
+            // 
+            this.UpdateNotice.AutoSize = true;
+            this.UpdateNotice.FontWeight = MetroFramework.MetroLinkWeight.Regular;
+            this.UpdateNotice.Location = new System.Drawing.Point(257, 55);
+            this.UpdateNotice.Name = "UpdateNotice";
+            this.UpdateNotice.Size = new System.Drawing.Size(6, 6);
+            this.UpdateNotice.TabIndex = 7;
+            this.UpdateNotice.UseSelectable = true;
+            this.UpdateNotice.Click += new System.EventHandler(this.UpdateNotice_Click);
+            // 
+            // VersionLabel
+            // 
+            this.VersionLabel.AutoSize = true;
+            this.VersionLabel.FontSize = MetroFramework.MetroLabelSize.Small;
+            this.VersionLabel.Location = new System.Drawing.Point(372, 245);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(17, 15);
+            this.VersionLabel.TabIndex = 8;
+            this.VersionLabel.Text = "--";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(435, 257);
+            this.ClientSize = new System.Drawing.Size(435, 259);
+            this.Controls.Add(this.VersionLabel);
+            this.Controls.Add(this.UpdateNotice);
             this.Controls.Add(this.BtnDown);
             this.Controls.Add(this.LblApiKey);
             this.Controls.Add(this.LblStatus);
@@ -159,6 +185,8 @@
         private MetroFramework.Controls.MetroLabel LblApiKey;
         private MetroFramework.Components.MetroToolTip TTLblApi;
         private MetroFramework.Controls.MetroButton BtnDown;
+        private MetroFramework.Controls.MetroLink UpdateNotice;
+        private MetroFramework.Controls.MetroLabel VersionLabel;
     }
 }
 
